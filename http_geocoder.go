@@ -2,6 +2,7 @@ package geo
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"io"
@@ -119,7 +120,14 @@ func response(ctx context.Context, url string, obj ResponseParser) error {
 	}
 	req = req.WithContext(ctx)
 
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
